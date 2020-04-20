@@ -1,0 +1,194 @@
+openapi: 3.0.2
+info:
+  title: CitizensE 
+  version: '1.0'
+  termsOfService: 'https://emergency.spilab.es/terms'
+  contact:
+    name: Emergency
+    url: 'https://spilab.es'
+    email: info@spilab.es
+paths:
+  /emergency:
+    post:
+      tags:
+        - Alert
+      operationId: postAlert
+      summary: Sends an alert to the users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Alert'
+      responses:
+        '201':
+          $ref: '#/components/responses/201'
+  /user:
+    get:
+      tags:
+        - User
+      operationId: getUsers
+      summary: Gets user id within an area.
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: radius
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          $ref: '#/components/responses/200user'
+        '404':
+          $ref: '#/components/responses/404'
+  /user/location:
+    get:
+      tags:
+        - User
+      operationId: getLocation
+      summary: Gets user location.
+      responses:
+        '200':
+          $ref: '#/components/responses/200location'
+        '404':
+          $ref: '#/components/responses/404'
+      
+  /user/mobility:
+    get:
+      tags:
+        - User
+      operationId: getMobility
+      summary: Gets user mobility report.
+      parameters:
+        - name: idUser
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          $ref: '#/components/responses/200mobility'
+        '404':
+          $ref: '#/components/responses/404'
+  /user/health:
+    get:
+      tags:
+        - User
+      operationId: getHealth
+      summary: Gets user health report.
+      responses:
+        '200':
+          $ref: '#/components/responses/200health'
+        '404':
+          $ref: '#/components/responses/404'
+components:
+  schemas:
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: 'Earthquake in the south zone of the city!'
+        description:
+          type: string
+          example: 'Earthquake in the south zone of the city with epicenter in the main avenue.'
+        area:
+          $ref: '#/components/schemas/Area'
+    Area:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 38.514377
+        longitude: 
+          type: number
+          format: double
+          example: -6.844325
+        radius:
+          type: number
+          format: double
+          example: 1000
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 38.514377
+        longitude: 
+          type: number
+          format: double
+          example: -6.844325
+    Mobility:
+      type: object
+      properties:
+        history:
+          type: string
+    Health:
+      type: object
+      properties:
+        history:
+          type: string
+  responses:
+    200user:
+        description: Returns idUser.
+        content:
+          application/json::
+            schema:
+              title: idUser
+              type: string
+              example: user447721
+    200location:
+        description: Returns location.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+    200value:
+        description: Returns a numerical value.
+        content:
+          application/json::
+            schema:
+              title: Numerical value
+              type: number
+              format: double
+              example: 80.5
+    200mobility:
+        description: Returns a boolean value.
+        content:
+          application/json::
+            schema:
+              $ref: '#/components/schemas/Mobility'
+    200health:
+        description: Returns a boolean value.
+        content:
+          application/json::
+            schema:
+              $ref: '#/components/schemas/Health'
+    201:
+      description: Posted
+      content:
+        text/plain:
+          schema:
+            title: Posted
+            type: string
+    404:
+      description: Not found response
+     

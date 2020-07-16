@@ -1,14 +1,14 @@
 openapi: 3.0.2
 info:
-  title: CitizensE 
+  title: EmergencyAPI
   version: '1.0'
-  termsOfService: 'https://emergency.spilab.es/terms'
+  termsOfService: 'https://emergency-example.spilab.es/terms'
   contact:
-    name: Emergency
+    name: EmergencyAPI
     url: 'https://spilab.es'
     email: info@spilab.es
 paths:
-  /emergency:
+  /alert:
     post:
       tags:
         - Alert
@@ -52,6 +52,51 @@ paths:
           $ref: '#/components/responses/200user'
         '404':
           $ref: '#/components/responses/404'
+  /user/status:
+    get:
+      tags:
+        - User
+      operationId: getStatus
+      summary: Gets user status.
+      parameters:
+        - name: idUser
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: minActivity
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: range
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        
+      responses:
+        '200':
+          $ref: '#/components/responses/200status'
+        '404':
+          $ref: '#/components/responses/404'
+  /user/check:
+    post:
+      tags:
+        - User
+      operationId: postStatus
+      summary: Send checking to the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Alert'
+      responses:
+        '201':
+          $ref: '#/components/responses/201'
   /user/location:
     get:
       tags:
@@ -64,24 +109,6 @@ paths:
         '404':
           $ref: '#/components/responses/404'
       
-  /user/mobility:
-    get:
-      tags:
-        - User
-      operationId: getMobility
-      summary: Gets user mobility report.
-      parameters:
-        - name: idUser
-          in: query
-          required: true
-          schema:
-            type: number
-            format: double
-      responses:
-        '200':
-          $ref: '#/components/responses/200mobility'
-        '404':
-          $ref: '#/components/responses/404'
   /user/health:
     get:
       tags:
@@ -125,6 +152,16 @@ components:
           type: number
           format: double
           example: 1000
+    Status:
+      type: object
+      properties:
+        activity:
+          type: string
+          example: "1 hour and 50 min"
+        longitude: 
+          type: number
+          format: double
+          example: -6.844325
     Location:
       type: object
       properties:
@@ -136,11 +173,6 @@ components:
           type: number
           format: double
           example: -6.844325
-    Mobility:
-      type: object
-      properties:
-        history:
-          type: string
     Health:
       type: object
       properties:
@@ -161,6 +193,12 @@ components:
           application/json:
             schema:
               $ref: '#/components/schemas/Location'
+    200status:
+        description: Returns status of the user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Status'
     200value:
         description: Returns a numerical value.
         content:
@@ -170,12 +208,6 @@ components:
               type: number
               format: double
               example: 80.5
-    200mobility:
-        description: Returns a boolean value.
-        content:
-          application/json::
-            schema:
-              $ref: '#/components/schemas/Mobility'
     200health:
         description: Returns a boolean value.
         content:
@@ -188,6 +220,13 @@ components:
         text/plain:
           schema:
             title: Posted
+            type: string
+    201status:
+      description: Status
+      content:
+        text/plain:
+          schema:
+            title: Status
             type: string
     404:
       description: Not found response
